@@ -1,16 +1,3 @@
---[[
-
-    Library Made for https://octohook.xyz/
-    Developed by liam#4567
-    Modified by tatar0071#0627
-
-    Ik this code is really shit in some places lol
-    will rewrite again i was just using some rly old stuff that i was lazy to rewrite
-    could've been a lot better and more optimized in some places and some things arent done as they should've been
-    got lazy when trying to make disable all roblox input when ui is open sooo that will be added later =)
-
-]]
-
 -- // Load
 
 local startupArgs = ({...})[1] or {}
@@ -843,19 +830,6 @@ function library:init()
     function self:SetOpen(bool)
         self.open = bool;
         screenGui.Enabled = bool;
-
-        if bool and library.flags.disablemenumovement then
-            actionservice:BindAction(
-                'FreezeMovement',
-                function()
-                    return Enum.ContextActionResult.Sink
-                end,
-                false,
-                unpack(Enum.PlayerActions:GetEnumItems())
-            )
-        else
-            actionservice:UnbindAction('FreezeMovement');
-        end
 
         updateCursor();
         for _,window in next, self.windows do
@@ -4576,12 +4550,6 @@ function library:init()
     
     -- Watermark
     do
-        if not IonHub_User then
-            getgenv().IonHub_User = {
-                UID = 0, 
-                User = "admin"
-            }
-        end
         self.watermark = {
             objects = {};
             text = {
