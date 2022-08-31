@@ -4758,6 +4758,21 @@ function library:CreateSettingsTab(menu)
         library:SetOpen(not library.open)
     end});
 
+    mainSection:AddToggle({text = 'Disable Movement If Open', flag = 'disablemenumovement', callback = function(bool)
+        if bool and library.open then
+            actionservice:BindAction(
+                'FreezeMovement',
+                function()
+                    return Enum.ContextActionResult.Sink
+                end,
+                false,
+                unpack(Enum.PlayerActions:GetEnumItems())
+            )
+        else
+            actionservice:UnbindAction('FreezeMovement');
+        end
+    end})
+
     mainSection:AddButton({text = 'Rejoin Server', confirm = true, callback = function()
         game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, game.JobId);
     end})
@@ -4770,11 +4785,35 @@ function library:CreateSettingsTab(menu)
         library:Unload();
     end})
 
+    mainSection:AddSeparator({text = 'Keybinds'});
+    mainSection:AddToggle({text = 'Keybind Indicator', flag = 'keybind_indicator', callback = function(bool)
+        library.keyIndicator:SetEnabled(bool);
+    end})
+    mainSection:AddSlider({text = 'Position X', flag = 'keybind_indicator_x', min = 0, max = 100, increment = .1, value = .5, callback = function()
+        library.keyIndicator:SetPosition(newUDim2(library.flags.keybind_indicator_x / 100, 0, library.flags.keybind_indicator_y / 100, 0));    
+    end});
+    mainSection:AddSlider({text = 'Position Y', flag = 'keybind_indicator_y', min = 0, max = 100, increment = .1, value = 35, callback = function()
+        library.keyIndicator:SetPosition(newUDim2(library.flags.keybind_indicator_x / 100, 0, library.flags.keybind_indicator_y / 100, 0));    
+    end});
+
+    mainSection:AddSeparator({text = 'Watermark'})
+    mainSection:AddToggle({text = 'Enabled', flag = 'watermark_enabled'});
+    mainSection:AddList({text = 'Position', flag = 'watermark_pos', selected = 'Custom', values = {'Top', 'Top Left', 'Top Right', 'Bottom Left', 'Bottom Right', 'Custom'}, callback = function(val)
+        library.watermark.lock = val;
+    end})
+    mainSection:AddSlider({text = 'Custom X', flag = 'watermark_x', suffix = '%', min = 0, max = 100, increment = .1});
+    mainSection:AddSlider({text = 'Custom Y', flag = 'watermark_y', suffix = '%', min = 0, max = 100, increment = .1});
+
+    local themeStrings = {"Custom"};
+    for _,v in next, library.themes do
+        table.insert(themeStrings, v.name)
+    end
     local themeTab = menu:AddTab('Theme', 990);
     local themeSection = themeTab:AddSection('Theme', 1);
     local setByPreset = false
 
     themeSection:AddList({text = 'Presets', flag = 'preset_theme', values = themeStrings, callback = function(newTheme)
+        if newTheme == "Custom" then return end
         setByPreset = true
         for _,v in next, library.themes do
             if v.name == newTheme then
@@ -4789,6 +4828,16 @@ function library:CreateSettingsTab(menu)
         end
         setByPreset = false
     end}):Select('Default');
+
+    for i, v in pairs(library.theme) do
+        themeSection:AddColor({text = i, flag = i, color = library.theme[i], callback = function(c3)
+            library.theme[i] = c3
+            library:SetTheme(library.theme)
+            if not setByPreset and not setByConfig then 
+                library.options.preset_theme:Select('Custom')
+            end
+        end});
+    end
 
     return settingsTab;
 end
