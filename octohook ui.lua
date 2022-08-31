@@ -4585,9 +4585,6 @@ function library:init()
         self.watermark = {
             objects = {};
             text = {
-                {self.cheatname, true},
-                {("%s (uid %s)"):format(IonHub_User.User, tostring(IonHub_User.UID)), true},
-                {self.gamename, true},
                 {'0 fps', true},
                 {'0ms', true},
                 {'00:00:00', true},
